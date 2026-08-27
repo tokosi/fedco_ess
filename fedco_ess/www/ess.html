@@ -1,0 +1,210 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Employee Self-Service{% endblock %}
+
+{% block head_include %}
+<style>
+	:root{
+		--f50:#FDF6F3;--f100:#F7E4DD;--f200:#EFC7BA;--f300:#DDA08B;
+		--f500:#984A35;--f600:#863F2C;--f700:#6B3222;--f800:#52261A;
+		--gold:#F8C525;--gold-soft:#FDF0C4;--gold-deep:#C89A12;
+		--green:#1D9644;--green-text:#17803A;--green-soft:#E3F5E9;
+		--ink:#2A1A14;--muted:#7A6660;--line:#EADFDA;
+		--r:10px;--rlg:16px;
+	}
+	.ess{max-width:1160px;margin:0 auto;padding:22px 16px 70px;color:var(--ink);
+	     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+	.ess *{box-sizing:border-box}
+
+	/* ---- hero ---- */
+	.hero{background:linear-gradient(140deg,var(--f600) 0%,var(--f800) 100%);
+	      border-radius:var(--rlg);padding:26px 28px;color:#FBEDE8;position:relative;
+	      overflow:hidden;margin-bottom:20px}
+	.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:260px;height:260px;
+	      border-radius:50%;background:radial-gradient(circle,rgba(248,197,37,.22) 0%,transparent 68%)}
+	.hero h1{margin:0 0 3px;font-size:1.55rem;font-weight:700;letter-spacing:-.02em}
+	.hero p{margin:0;opacity:.86;font-size:.92rem}
+	.hero .meta{margin-top:14px;display:flex;gap:22px;flex-wrap:wrap;font-size:.83rem;opacity:.9}
+	.hero .meta b{display:block;font-size:1rem;opacity:1}
+	.hero .acts{position:relative;z-index:2;margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+	.btn{border:none;border-radius:8px;padding:9px 15px;font-size:.85rem;font-weight:600;
+	     cursor:pointer;min-height:42px;display:inline-flex;align-items:center;gap:6px;
+	     text-decoration:none}
+	.btn-gold{background:var(--gold);color:var(--ink)}
+	.btn-gold:hover{background:var(--gold-deep);color:var(--ink)}
+	.btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3)}
+	.btn-ghost:hover{background:rgba(255,255,255,.22);color:#fff}
+
+	/* ---- stat strip ---- */
+	.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:22px}
+	.stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+	.stat .k{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+	.stat .v{font-size:1.5rem;font-weight:700;margin-top:3px}
+	.stat .v.g{color:var(--green-text)}
+	.stat .v.b{color:var(--f600)}
+	.stat .sub{font-size:.75rem;color:var(--muted);margin-top:1px}
+
+	/* ---- sections ---- */
+	.sec{margin:26px 0 12px;display:flex;align-items:center;gap:11px}
+	.sec h2{margin:0;font-size:.74rem;font-weight:700;letter-spacing:.13em;
+	        text-transform:uppercase;color:var(--f600);white-space:nowrap}
+	.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+
+	.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:11px}
+	.tile{background:#fff;border:1px solid var(--line);border-radius:var(--r);
+	      padding:15px 15px 14px;text-decoration:none;color:var(--ink);display:block;
+	      transition:border-color .15s,box-shadow .15s,transform .06s;min-height:80px}
+	.tile:hover{border-color:var(--f300);box-shadow:0 4px 14px rgba(58,27,18,.10);
+	      color:var(--f700);text-decoration:none}
+	.tile:active{transform:translateY(1px)}
+	.tile .ico{width:32px;height:32px;border-radius:8px;background:var(--f50);
+	      display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+	.tile .ico svg{width:17px;height:17px;stroke:var(--f600);fill:none;stroke-width:2;
+	      stroke-linecap:round;stroke-linejoin:round}
+	.tile .lbl{font-size:.87rem;font-weight:600;line-height:1.3}
+
+	/* ---- panels ---- */
+	.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:6px}
+	.panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+	.panel h3{margin:0 0 11px;font-size:.9rem;font-weight:700}
+	.row{display:flex;justify-content:space-between;align-items:center;
+	     padding:8px 0;border-top:1px solid var(--line);font-size:.86rem}
+	.row:first-of-type{border-top:none}
+	.pill{padding:2px 10px;border-radius:999px;font-size:.72rem;font-weight:600;
+	      line-height:1.35;white-space:nowrap;display:inline-block}
+	.pill-ok{background:var(--green-soft);color:#106B2E}
+	.pill-wait{background:var(--gold-soft);color:#7A5B02}
+	.pill-info{background:var(--f100);color:var(--f700)}
+	.empty{color:var(--muted);font-size:.85rem;padding:6px 0}
+
+	.notice{background:var(--gold-soft);border:1px solid #EBD79A;border-radius:var(--r);
+	        padding:14px 16px;margin-bottom:18px;font-size:.88rem;color:#6B5202}
+
+	@media(max-width:760px){
+		.cols{grid-template-columns:1fr}
+		.grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
+		.hero{padding:20px}
+		.hero h1{font-size:1.3rem}
+	}
+	@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="ess">
+
+	<div class="hero">
+		<h1>Hello, {{ (user_fullname or "there").split(" ")[0] }}</h1>
+		<p>Your self-service portal &mdash; leave, claims, payslips and requests in one place.</p>
+
+		{%- if not no_employee %}
+		<div class="meta">
+			<div><span>Employee</span><b>{{ employee.name }}</b></div>
+			{%- if employee.designation %}<div><span>Role</span><b>{{ employee.designation }}</b></div>{% endif %}
+			{%- if employee.department %}<div><span>Department</span><b>{{ employee.department }}</b></div>{% endif %}
+		</div>
+		<div class="acts">
+			<a class="btn btn-gold" href="/app/expense-claim/new">New Claim</a>
+			<a class="btn btn-ghost" href="/app/leave-application/new">Apply for Leave</a>
+			<button class="btn btn-ghost" onclick="essCheckin('IN')">Check In</button>
+			<button class="btn btn-ghost" onclick="essCheckin('OUT')">Check Out</button>
+		</div>
+		{%- endif %}
+	</div>
+
+	{%- if no_employee %}
+	<div class="notice">
+		Your user account isn't linked to an Employee record yet, so personal figures can't be
+		shown. Ask HR to set <b>User ID</b> on your Employee record. The links below still work.
+	</div>
+	{%- else %}
+
+	<div class="stats">
+		{%- for b in leave_balances %}
+		<div class="stat">
+			<div class="k">{{ b.leave_type }}</div>
+			<div class="v g">{{ b.balance }}</div>
+			<div class="sub">days remaining</div>
+		</div>
+		{%- endfor %}
+		{%- if latest_payslip %}
+		<div class="stat">
+			<div class="k">Last Payslip</div>
+			<div class="v b">{{ frappe.utils.fmt_money(latest_payslip.net_pay, currency=latest_payslip.currency) }}</div>
+			<div class="sub">{{ frappe.utils.formatdate(latest_payslip.end_date, "MMM yyyy") }}</div>
+		</div>
+		{%- endif %}
+	</div>
+
+	<div class="cols">
+		<div class="panel">
+			<h3>In Progress</h3>
+			<div class="row"><span>Leave applications</span>
+				<span class="pill {{ 'pill-wait' if pending.leave else 'pill-info' }}">{{ pending.leave }} draft</span></div>
+			<div class="row"><span>Expense claims</span>
+				<span class="pill {{ 'pill-wait' if pending.claims else 'pill-info' }}">{{ pending.claims }} draft</span></div>
+			<div class="row"><span>Cash advances</span>
+				<span class="pill {{ 'pill-wait' if pending.advances else 'pill-info' }}">{{ pending.advances }} draft</span></div>
+			<div class="row"><span>Timesheets</span>
+				<span class="pill {{ 'pill-wait' if pending.timesheets else 'pill-info' }}">{{ pending.timesheets }} draft</span></div>
+		</div>
+
+		<div class="panel">
+			<h3>{% if approvals %}Awaiting Your Approval{% else %}Announcements{% endif %}</h3>
+			{%- if approvals %}
+			{%- for a in approvals %}
+			<div class="row">
+				<a href="/app/{{ a.doctype | lower | replace(' ', '-') }}">{{ a.doctype }}</a>
+				<span class="pill pill-wait">{{ a.count }} pending</span>
+			</div>
+			{%- endfor %}
+			{%- elif announcements %}
+			{%- for a in announcements %}
+			<div class="row">
+				<a href="/app/hr-announcement/{{ a.name }}">{{ a.title }}</a>
+				<span class="pill pill-info">{{ frappe.utils.formatdate(a.posted_on, "dd MMM") }}</span>
+			</div>
+			{%- endfor %}
+			{%- else %}
+			<div class="empty">Nothing to show right now.</div>
+			{%- endif %}
+		</div>
+	</div>
+	{%- endif %}
+
+	{%- for group in tiles %}
+	<div class="sec"><h2>{{ group.title }}</h2></div>
+	<div class="grid">
+		{%- for item in group['items'] %}
+		<a class="tile" href="{{ item.route }}">
+			<div class="ico">
+				<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8M8 12h8"></path></svg>
+			</div>
+			<div class="lbl">{{ item.label }}</div>
+		</a>
+		{%- endfor %}
+	</div>
+	{%- endfor %}
+
+</div>
+
+<script>
+function essCheckin(type){
+	frappe.call({
+		method: "fedco_ess.www.ess.quick_checkin",
+		args: { log_type: type },
+		callback: function(r){
+			if(r.message){
+				frappe.show_alert({
+					message: "Checked " + (r.message.log_type === "OUT" ? "out" : "in") + " successfully",
+					indicator: "green"
+				});
+			}
+		},
+		error: function(){
+			frappe.show_alert({ message: "Could not record the check-in", indicator: "red" });
+		}
+	});
+}
+</script>
+{% endblock %}
