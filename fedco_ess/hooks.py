@@ -43,3 +43,7 @@ after_install = "fedco_ess.install.after_install"
 after_migrate = "fedco_ess.install.after_migrate"
 
 fixtures = []
+
+doctype_js = {
+	"FEDCO Memo": "public/js/fedco_memo.js",
+}
