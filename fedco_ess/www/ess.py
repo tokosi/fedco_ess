@@ -192,6 +192,13 @@ def build_tiles(employee):
 			],
 		},
 		{
+			"title": "Memos & Correspondence",
+			"items": [
+				("Write a Memo", "edit", "/app/fedco-memo/new", "FEDCO Memo"),
+				("My Memos", "mail", "/app/fedco-memo", "FEDCO Memo"),
+			],
+		},
+		{
 			"title": "Performance",
 			"items": [
 				("My Goals / KRAs", "target", "/app/goal", "Goal"),
